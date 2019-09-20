@@ -7,6 +7,94 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
 
+    const handleResponse  = (xhr) =>{
+      const content = document.querySelector('#content');
+
+      switch(xhr.status)
+      {
+        case 200:
+          content.innerHTML = `<b>Successful response!</b>`;
+          break;
+        case 400:
+          content.innerHTML = `<b>Bad Request!</b>`;
+          break;
+        case 401:
+          content.innerHTML = `<b>Unauthorized!</b>`;
+          break;
+        case 403:
+          content.innerHTML = `<b>Forbidden!</b>`;
+          break;
+        case 404:
+          content.innerHTML = `<b>Resource Not Found!</b>`;
+          break;
+        case 500:
+          content.innerHTML = `<b>Internal Server Error!</b>`;
+          break;
+        case 501:
+          content.innerHTML = `<b>Not Implemented!</b>`;
+          break;
+      }
+
+      //Printing out the data regardless of type
+      console.log(xhr.response);
+
+      //Specific formatting for responses depending on reponseType
+      if(xhr.responseType === 'json')
+      {
+        content.innerHTML += `<p>Message: ${xhr.response.message}</p>`;
+      }
+      else if(xhr.responseType === 'document')
+      {
+
+        content.innerHTML += `<p>Message: ${xhr.responseXML.querySelector('message').textContent} </p>`;
+
+      }
+    }
+
+
+    const getData = (e) =>{
+      const dataPath = document.querySelector('#page').value;
+      const dataType = document.querySelector('#type').value;
+
+      const xhr = new XMLHttpRequest();
+
+      //Making get request for the data, using the path specified in the dropdown
+      xhr.open('GET', dataPath);
+
+      //Setting the repsonse type, will be used for formatting later
+      if(dataType === 'application/json')
+      {
+        xhr.responseType = 'json';
+      }
+      else 
+      {
+        xhr.responseType = 'document';
+      }
+      
+      //Setting the Accept type to be what is in the type dropdown
+      xhr.setRequestHeader('Accept', dataType);
+
+      xhr.onload = () => handleResponse(xhr);
+
+      //Actualy sending the request
+      xhr.send();
+
+      e.preventDefault();
+
+      return false;
+
+    }
+
+    const init = () =>{
+      const sendBut = document.querySelector('#send');
+    
+      const sendData = (e) => getData(e);
+
+      sendBut.addEventListener('click', sendData);
+    }
+
+    window.onload = init;
+    
   </script>
 </head>
 <body>
